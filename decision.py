@@ -12,7 +12,7 @@ class node:
     def addchild(self,key,newnode):
         self.list[key]=newnode;
 
-def subentroy(l):
+def subentropy(l):
     if l[0]==0 or l[1]==0:
         return 0,l[0]+l[1];
     sub1 = l[0]/(l[0]+l[1])
@@ -20,7 +20,7 @@ def subentroy(l):
 
     return -sub1*math.log(sub1,2)-sub2*math.log(sub2,2),l[0]+l[1]
 
-def entroy(df,name,resultname,indexlist):
+def entropy(df,name,resultname,indexlist):
     total = len(indexlist)
     entro=0;
     ma = {};
@@ -33,7 +33,7 @@ def entroy(df,name,resultname,indexlist):
             ma[i] = [0,0]
             ma[i][result]+=1;
     for i in ma.keys():
-        sube,subt = subentroy(ma[i])
+        sube,subt = subentropy(ma[i])
         entro += subt / total * sube;
     return entro;
 
@@ -59,12 +59,12 @@ def makesubtree(df,namelist,resultname,indexlist):
     
     min=32767
     for name in namelist:
-        val = entroy(df,name,resultname,indexlist)
+        val = entropy(df,name,resultname,indexlist)
         if val<min:
             
             min = val
             ans = name
-    if (min==1.0):
+    if (min==32767):
         mynode.leaf = True
         if (pos>=neg):
             mynode.judge = 1;

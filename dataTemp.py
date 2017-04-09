@@ -11,9 +11,11 @@ import pandas as pd
 import numpy as np
 import math
 import dateutil.parser as dparser
-
+import time
 import random
 # In[2]:
+
+starttime = time.time();
 
 data_bot = pd.read_csv('data/bots_data.csv', encoding='iso-8859-1')
 data_nonbot = pd.read_csv('data/nonbots_data.csv', encoding='iso-8859-1')
@@ -221,44 +223,47 @@ ma=[];
 for name in data_example.columns:
     if name!='bot':
         ma.append(name);
-        
-print("build tree")
 
-indexlist=[];
-
-for i in range(len(data_example)):
-    indexlist.append(i)
-
-random.shuffle(indexlist)
-size = len(indexlist)
 accuracy = 0.0
 precision = 0.0
 recall = 0.0
 f1score = 0.0
-for k in range(10):
-    train = []
-    test = []
-    for i in range(size):
-        if (i >= k * size/10) and ( i <=(k+1)*size/10):
-            test.append(indexlist[i])
-        else:
-            train.append(indexlist[i])
-    mynode = decision.makesubtree(data_example,ma,'bot',train)
-    print("build finish")
-    result = decision.judgeData(mynode, data_example, ma, 'bot',test )
-    tp=result[0]
-    fp=result[1]
-    fn=result[2]
-    tn=result[3]
-    print(result)
-    accuracy += (tp+tn)/len(test)
-    precise = tp/(tp+fp)
-    recal = tp/(tp+fn)
-    precision += precise
-    recall+=recal
-    f1score+=2*(1/((1/precise)+(1/recal)))
-print("accuracy:",accuracy/10)
-print("precision:",precision/10)
-print("recall:",recall/10)
-print("f1score:",f1score/10)
+
+for kk in range(5):
+    print(kk)
+    indexlist=[];
+
+    for i in range(len(data_example)):
+        indexlist.append(i)
+
+    random.shuffle(indexlist)
+    size = len(indexlist)
+    for k in range(10):
+        train = []
+        test = []
+        for i in range(size):
+            if (i >= k * size/10) and ( i <=(k+1)*size/10):
+                test.append(indexlist[i])
+            else:
+                train.append(indexlist[i])
+        mynode = decision.makesubtree(data_example,ma,'bot',train)
+        result = decision.judgeData(mynode, data_example, ma, 'bot',test )
+        tp=result[0]
+        fp=result[1]
+        fn=result[2]
+        tn=result[3]
+        accuracy += (tp+tn)/len(test)
+        precise = tp/(tp+fp)
+        recal = tp/(tp+fn)
+        precision += precise
+        recall+=recal
+        f1score+=2*(1/((1/precise)+(1/recal)))
+print("accuracy:",accuracy/50)
+print("precision:",precision/50)
+print("recall:",recall/50)
+print("f1score:",f1score/50)
+
+endtime = time.time()
+usetime=endtime-starttime;
+print(usetime)
 
