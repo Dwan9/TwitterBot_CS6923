@@ -5,12 +5,14 @@
 
 # In[1]:
 
+import decision
+
 import pandas as pd
 import numpy as np
 import math
 import dateutil.parser as dparser
 
-
+import random
 # In[2]:
 
 data_bot = pd.read_csv('data/bots_data.csv', encoding='iso-8859-1')
@@ -135,77 +137,77 @@ def DataFrameFilter():
     for attrStr in attrList:
         if attrStr == "id":
             checkNumber(data_class, attrStr, 10)
-            print(attrStr)
+            #print(attrStr)
         
-        elif attrStr == "id_str":
-            print(attrStr)
+        #elif attrStr == "id_str":
+        #    print(attrStr)
         
         elif attrStr == "screen_name":
             checkStringBot(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "location":
             checkNone(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "description":
             checkNone(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "url":
             checkNone(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "followers_count":
             checkNumber(data_class, attrStr, 2)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "friends_count":
             checkNumber(data_class, attrStr, 2)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "listedcount":
             checkNumber(data_class, attrStr, 2)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "created_at":
             checkDate(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "favorites_count":
             checkNumber(data_class, attrStr, 2)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "verified":
             checkTF(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "statuses_count":
             checkNumber(data_class, attrStr, 2)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "lang":
             checkEnglish(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "status":
             checkNone(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "default_profile":
             checkTF(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "default_profile_image":
             checkTF(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
         elif attrStr == "has_extended_profile":
             checkTF(data_class, attrStr)
-            print(attrStr)
+            #print(attrStr)
         
-        elif attrStr == "name":
-            print(attrStr)       
+        #elif attrStr == "name":
+            #print(attrStr)       
 
     return data_class
 
@@ -213,11 +215,50 @@ def DataFrameFilter():
 # In[11]:
 
 #example
+
 data_example = DataFrameFilter()
-data_example.head(10)
+ma=[];
+for name in data_example.columns:
+    if name!='bot':
+        ma.append(name);
+        
+print("build tree")
 
+indexlist=[];
 
-# In[ ]:
+for i in range(len(data_example)):
+    indexlist.append(i)
 
-
+random.shuffle(indexlist)
+size = len(indexlist)
+accuracy = 0.0
+precision = 0.0
+recall = 0.0
+f1score = 0.0
+for k in range(10):
+    train = []
+    test = []
+    for i in range(size):
+        if (i >= k * size/10) and ( i <=(k+1)*size/10):
+            test.append(indexlist[i])
+        else:
+            train.append(indexlist[i])
+    mynode = decision.makesubtree(data_example,ma,'bot',train)
+    print("build finish")
+    result = decision.judgeData(mynode, data_example, ma, 'bot',test )
+    tp=result[0]
+    fp=result[1]
+    fn=result[2]
+    tn=result[3]
+    print(result)
+    accuracy += (tp+tn)/len(test)
+    precise = tp/(tp+fp)
+    recal = tp/(tp+fn)
+    precision += precise
+    recall+=recal
+    f1score+=2*(1/((1/precise)+(1/recal)))
+print("accuracy:",accuracy/10)
+print("precision:",precision/10)
+print("recall:",recall/10)
+print("f1score:",f1score/10)
 
