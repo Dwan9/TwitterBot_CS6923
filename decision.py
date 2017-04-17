@@ -3,8 +3,9 @@ import numpy as np
 import math
 class node:
     def __init__(self):
+        self.count=0;
         self.list = {};
-        self.leaf = False;
+        self.leaf = 0;
         self.judge = -1;
         self.attribute = '';
         self.percent=-1;
@@ -21,7 +22,7 @@ def subentropy(l):
     return -sub1*math.log(sub1,2)-sub2*math.log(sub2,2),l[0]+l[1]
 
 def entropy(df,name,resultname,indexlist):
-    total = len(indexlist)
+    total = len(indexlist);
     entro=0;
     ma = {};
     for index in indexlist:
@@ -31,7 +32,7 @@ def entropy(df,name,resultname,indexlist):
             ma[i][result]+=1
         else:
             ma[i] = [0,0]
-            ma[i][result]+=1;
+            ma[i][result]+=1
     for i in ma.keys():
         sube,subt = subentropy(ma[i])
         entro += subt / total * sube;
@@ -39,6 +40,7 @@ def entropy(df,name,resultname,indexlist):
 
 def makesubtree(df,namelist,resultname,indexlist):
     mynode = node()
+    mynode.count = len(indexlist);
     judge = -1;
     pos=0;
     neg=0;
@@ -47,13 +49,16 @@ def makesubtree(df,namelist,resultname,indexlist):
         if t==1:
             pos+=1
         else:
-            neg+=1;
+            neg+=1
 
     mynode.percent = pos / (pos+neg)
     
-    if (pos*neg==0):
-        mynode.leaf = True
-        mynode.judge = t
+    if (mynode.percent < 0.05) or (mynode.percent>0.95):
+        mynode.leaf = 1
+        if mynode.percent<0.05:
+            mynode.judge = 0;
+        else:
+            mynode.judge = 1;
         
         return mynode;
     
@@ -109,7 +114,21 @@ def judge(node,ma):
         try:
             return judge(node.list[ma[node.attribute]],ma);
         except KeyError:
-            return node.percent > 0.5;
+            count = 0;
+            for children in node.list.keys():
+                if judge(node.list[children],ma)==1:
+                    count+=node.list[children].count;
+                else:
+                    count-=node.list[children].count;
+            if count>0:
+                return 1;
+            elif count<0:
+                return -1;
+            elif node.percent > 0.5:
+                return 1;
+            else:
+                return 0;
+
     
 def judgeData(node, df, namelist, resultname,indexlist):
     ans=[0,0,0,0]
@@ -120,18 +139,41 @@ def judgeData(node, df, namelist, resultname,indexlist):
         result = judge(node,ma)
         trueresult=df[resultname][index]
         if (trueresult==1):
-            if (result):
+            if (result==1):
                 ans[0]+=1
             else:
                 ans[2]+=1
         else:
-            if (result):
+            if (result==1):
                 ans[1]+=1
             else:
                 ans[3]+=1
 
     return ans;
 
+def judgeError(node, df, namelist, resultname,indexlist):
+    match = [];
+    miss = [];
+    for index in indexlist:
+        ma={}
+        for name in namelist:
+            ma[name]=df[name][index]
+        result = judge(node,ma)
+        trueresult=df[resultname][index]
+        if (result==trueresult):
+            match.append(index)
+        else:
+            miss.append(index)
 
+    return match,miss
 
+def getResult(node, df, namelist, resultname,indexlist):
+    ans = [];
+    for index in indexlist:
+        ma={}
+        for name in namelist:
+            ma[name]=df[name][index]
+        result = judge(node,ma)
+        ans.append(result);
+    return ans;
 
