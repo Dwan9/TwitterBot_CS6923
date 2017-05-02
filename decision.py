@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import math
 class node:
     def __init__(self):
@@ -74,7 +72,7 @@ def makesubtree(df,namelist,resultname,indexlist):
         if (pos>=neg):
             mynode.judge = 1;
         else:
-            mynode.judge
+            mynode.judge = 0
         
         return mynode
     ma = {}
@@ -123,7 +121,7 @@ def judge(node,ma):
             if count>0:
                 return 1;
             elif count<0:
-                return -1;
+                return 0;
             elif node.percent > 0.5:
                 return 1;
             else:
