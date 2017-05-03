@@ -7,10 +7,10 @@ import random
 import decision
 
 
-data_bot = pd.read_csv('data/bots_data.csv', encoding='iso-8859-1')
-data_nonbot = pd.read_csv('data/nonbots_data.csv', encoding='iso-8859-1')
+data_bot = pd.read_csv('data/training_data.csv', encoding='utf-8')
+#data_nonbot = pd.read_csv('data/nonbots_data.csv', encoding='iso-8859-1')
 data_combine = data_bot
-data_combine = data_combine.append(data_nonbot, ignore_index=True)
+#data_combine = data_combine.append(data_nonbot, ignore_index=True)
 
 indexlist=[]
 
@@ -26,8 +26,9 @@ for name in data_combine.columns:
 trainid=[]
 testid=[]
 i=0;
+print(len(data_combine))
 for idnex in range(len(data_combine)):
-    if (idnex>=len(data_bot)-200 and idnex<len(data_bot)+200):
+    if (idnex>=1121 and idnex<1521):
         continue;
     trainid.append(i)
     for name in data_combine.columns:
@@ -38,9 +39,7 @@ i=0;
 for i in range(400):
     testid.append(i)
     for name in data_combine.columns:
-        testmap[name].append(data_combine[name][indexlist[len(data_bot)-200+i]]);
-
-
+        testmap[name].append(data_combine[name][indexlist[1121+i]]);
     
 sData_train = pd.DataFrame(index=trainid,columns=data_combine.columns);
 for name in data_combine.columns:
@@ -169,8 +168,9 @@ def checkNone(data_source, data_class, attrstr):
     data_class[attrstr]=0
     idx = 0
     for value in data_source[attrstr]:
-        if value == "" or value == "None" or value == "\"\"" or value == "null" or pd.isnull(value):
-            data_class.loc[idx,attrstr] = 1
+        if attrstr!='url':
+            if value == "" or value == "None" or value == "\"\"" or value == "null" or pd.isnull(value):
+                data_class.loc[idx,attrstr] = 1
         idx += 1
 
 def checkTF(data_source, data_class, attrstr):
@@ -314,7 +314,7 @@ def DataFrameFilter(dataSource):
             print(attrStr)
         
         elif attrStr == "url":
-            checkNone(dataSource, data_class, attrStr)
+            #checkNone(dataSource, data_class, attrStr)
             print(attrStr)
         
         elif attrStr == "followers_count":
